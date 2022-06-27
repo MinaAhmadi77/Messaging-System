@@ -45,9 +45,10 @@ def connect():
 def register(command,mydb):
     strr= str(datetime.datetime.now())
     newComm=new_command(command,mydb)
+    x = datetime.datetime.now()
     query = "insert into `users`(`first_name`, `last_name`,`phone_number`, `user_id`, `pass`, `email`, `sec_answer`,`login`,`number_wrong`,`number_wrong_Q`,`date_wrong`) values(" + \
             newComm[0] + "," + newComm[1] + "," + newComm[2] + "," + newComm[3] + "," + newComm[4] + "," + newComm[
-                5] + "," + newComm[6] + "," + '"no"' + "," + "0" + "," + "0" + "," + '"2020-07-22 00:10:00"' + ");"
+                5] + "," + newComm[6] + "," + '"no"' + "," + "0" + "," + "0" + "," +'"'+ str(x)+'"' + ");"
     myresult =fertchall_query(query,mydb)
     mydb.commit()
 
@@ -66,28 +67,54 @@ def fertchall_query(query,mydb):
 
 def check_login(cammand,mydb):
     newComm = new_command(command)
-    query="select user_id from users where users.user_id ="+newComm[0]+";"
-    myresult=fertchall_query(query,mydb)
-    if(myresult):
-        myresult=''
-        query = "select user_id from users where users.user_id =" + newComm[0] +"and users.pass="+newComm[1]+ ";"
+    if(user_exist(newComm[0],mydb)):
+        query = "select user_id from users where users.user_id =" + newComm[0] + "and users.pass=" + newComm[1] + "and login ='no';"
         myresult=fertchall_query(query,mydb)
         if(myresult):
-            # query = "select user_id from users where users.user_id =" + newComm[0] + "and users.pass=" + newComm[1] + "and login ='no';"
-            # myresult=fertchall_query(query,mydb)
-            # if(myresult):
-            global user
-            user=cammand[0]
-            print(user)
-            query="UPDATE users SET login='yes' WHERE users.user_id ="+newComm[0]+";"
-            fertchall_query(query,mydb)
-            mydb.commit()
-            print("login is successful")
-            login(cammand,mydb)
-            # else:
-            #     print("you can not login because you'r loged in from somewhere else, pls sing out from there first !!")
+            query = "SELECT date_wrong FROM users WHERE user_id=" + newComm[0] + ";"
+            date_wrong = fertchall_query(query, mydb)
+            time_now = datetime.datetime.now()
+            query = "SELECT number_wrong FROM users WHERE user_id=" + newComm[0] + ";"
+            number_wrong=fertchall_query(query,mydb)
+            difference=time_now - date_wrong[0][0]
+            seconds_in_day = 24 * 60 * 60
+            minutes_in_day=24*60
+            result=divmod(difference.days * seconds_in_day + difference.seconds, 60)
+            print(result)
+            if(number_wrong[0][0]<3 or result[0]>=minutes_in_day ):
+                myresult=''
+                query = "select user_id from users where users.user_id =" + newComm[0] +"and users.pass="+newComm[1]+ ";"
+                myresult=fertchall_query(query,mydb)
+                if(myresult):
+
+                    global user
+                    user=cammand[0]
+                    print(user)
+                    query="UPDATE users SET login='yes' WHERE users.user_id ="+newComm[0]+";"
+                    fertchall_query(query,mydb)
+                    mydb.commit()
+                    print("login is successful")
+                    new=0
+                    query="UPDATE users SET number_wrong=" + '"' + str(new) + '"' + "WHERE user_id=" +newComm[0] + ";"
+                    myresult=fertchall_query(query,mydb)
+                    mydb.commit()
+                    login(cammand,mydb)
+
+                else:
+                    time = datetime.datetime.now()
+                    query="UPDATE users SET date_wrong="+'"'+str(time)+'"'+"WHERE user_id=" + newComm[0]+ ";"
+                    myresult=fertchall_query(query,mydb)
+                    mydb.commit()
+                    c=number_wrong[0][0]
+                    c+=1
+                    query = "UPDATE users SET number_wrong=" + '"' + str(c) + '"' + "WHERE user_id=" + newComm[0] + ";"
+                    myresult=fertchall_query(query,mydb)
+                    mydb.commit()
+                    print("password is not correct!!")
+            else:
+                print("you can not login before one day!")
         else:
-            print("password is not correct!!")
+            print("you can not login because you'r loged in from somewhere else, pls sing out from there first !!")
     else:
         print("user not found!!")
 
@@ -349,6 +376,11 @@ def finder(com,mydb):
     else:
         print("can not find anyone")
 
+def sign_out(mydb):
+
+    query="UPDATE users SET login='no' WHERE users.user_id ="+'"'+user+'"'+";"
+    myresult=fertchall_query(query,mydb)
+    print("sign out successfuly")
 
 def login(command,mydb):
     newComm=new_command(command)
@@ -358,7 +390,7 @@ def login(command,mydb):
         if com[0]=='find_person' and len(com) - 1 == 1:
             finder(com[1],mydb)
         elif com[0]=='sign_out' and len(com) - 1 == 0:
-            print("sign out successfuly")
+            sign_out(mydb)
             break
         elif com[0]=='follow'and len(com) - 1 == 1:
             follow(com,mydb)
@@ -386,6 +418,21 @@ def login(command,mydb):
             password_recovery(mydb)
 if __name__ == '__main__':
     mydb=connect()
+    # query="UPDATE users SET login='no' WHERE users.user_id = 'm412';"
+    # myresult=fertchall_query(query,mydb)
+    # mydb.commit()
+    # query="UPDATE users SET login='no' WHERE users.user_id = 'e412';"
+    # myresult=fertchall_query(query,mydb)
+    # mydb.commit()
+    # query="UPDATE users SET login='no' WHERE users.user_id = 'mkkk412';"
+    # myresult=fertchall_query(query,mydb)
+    # mydb.commit()
+    # query="UPDATE users SET login='no' WHERE users.user_id = 'moo412';"
+    # myresult=fertchall_query(query,mydb)
+    # mydb.commit()
+    # query="UPDATE users SET login='no' WHERE users.user_id = 'oo412';"
+    # myresult=fertchall_query(query,mydb)
+    # mydb.commit()
     while True:
         sign_flag = True
         inp = input('Please enter a number:\n'
@@ -406,6 +453,7 @@ if __name__ == '__main__':
                     print("Wrong input.")
         elif inp == "2":
             while True:
+
                 command = input('Please enter user_name/password\n'
                                 'for example: ali98/123456\n').split('/')
                 if len(command) == 2:
