@@ -107,7 +107,84 @@ def print_help():
         'send_message\t\t/<type (0=ava or 1=text)>/<ava id (int)>/<text (string)>/<receiver send_message(string)> - to send message\n'
         'like_message\t\t\t/<ava id (int)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to like ava\n'
         'sign_out \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to sign out\n'
+        'password_recovery \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to sign out\n'
         'delete_account \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to sign out')
+
+
+def password_recovery(my_user,mydb):
+
+    try:
+        query = "SELECT number_wrong_Q FROM users WHERE user_id=" + '"' + my_user + '"' + ";"
+        number_wrong_Q=fertchall_query(query,mydb)
+        if(number_wrong_Q[0][0]<5):
+            print("pls enter the answer of security answer (What is your favorite color?) :")
+            input1=input()
+            query = "SELECT number_wrong_Q FROM users WHERE user_id=" + '"' + my_user + '"' +"and sec_answer="+'"'+input1+'"'+ ";"
+            myresult=fertchall_query(query,mydb)
+            print(myresult)
+            if(myresult):
+                print("pls enter your new password:")
+                input2=input()
+                if re.fullmatch(r'[A-Za-z0-9]{8,}',input2):
+                    query="UPDATE users SET pass="+'"'+input2+'"'+"WHERE user_id=" + '"' + my_user + '"'+ ";"
+                    myresult=fertchall_query(query,mydb)
+                    mydb.commit()
+                    new =0
+                    query = "UPDATE users SET number_wrong_Q=" + '"' + str(new) + '"' + "WHERE user_id=" + '"' + my_user + '"' + ";"
+                    myresult = fertchall_query(query, mydb)
+                    mydb.commit()
+                    print("recovery successful")
+
+                else:
+                    print("pls check password format")
+            else:
+                new=number_wrong_Q[0][0]
+                new+=1
+                query="UPDATE users SET number_wrong_Q="+'"'+str(new)+'"'+"WHERE user_id=" + '"' + my_user + '"'+ ";"
+                myresult=fertchall_query(query,mydb)
+                mydb.commit()
+                print("your answer is wrong!!")
+        else:
+
+            print("you can not recovery password with security answer(just with phone and email)")
+
+    except Exception as e:
+        print(e)
+
+
+
+def like_message(com,mydb):
+    newComm=new_command(com)
+
+    try:
+        query = "SELECT message_id FROM message WHERE message_id=" + newComm[1] + "and receiver=" + '"' + user + '"' + ";"
+        myresult=fertchall_query(query,mydb)
+        if(myresult):
+            query = "UPDATE message SET liked='yes' WHERE message_id=" + newComm[1] + "and receiver=" + '"' + user + '"' + ";"
+            myresult=fertchall_query(query,mydb)
+            mydb.commit()
+            print("message liked")
+        else:
+            print("this message was not exist ")
+    except Exception as e:
+        print(e)
+def show_messages(mydb):
+    query = "SELECT * FROM message WHERE receiver=" + '"' + user + '"' + ";"
+    try:
+        myresult=fertchall_query(query,mydb)
+        if(myresult):
+            print("show messages like this format:")
+            print("message_code : (message_id, text , sender , receiver , send_date , seen (yes or no), like(yes or no))")
+            print()
+            for x in myresult:
+                print(x)
+            query="UPDATE message SET seen='yes' WHERE receiver=" + '"' + user + '"' + ";"
+            myresult=fertchall_query(query,mydb)
+            mydb.commit()
+        else:
+            print("you have not any message")
+    except Exception as e:
+        print(e)
 def send_message(com,mydb):
     newComm=new_command(com)
     if(user_exist(newComm[1],mydb)):
@@ -126,8 +203,8 @@ def send_message(com,mydb):
             print("you can not send message because you are not his/him friend")
     else:
         print("user not found")
-def user_exist(user,mydb):
-    query="SELECT user_id FROM users WHERE user_id=" + user  + ";"
+def user_exist(user1,mydb):
+    query="SELECT user_id FROM users WHERE user_id=" + user1  + ";"
     myresult=fertchall_query(query,mydb)
     if(myresult):
         return True
@@ -301,6 +378,12 @@ def login(command,mydb):
             unblock(com,mydb)
         elif com[0]=='send_message'and len(com) - 1 == 2:
             send_message(com,mydb)
+        elif com[0]=='show_messages'and len(com) - 1 == 0:
+            show_messages(mydb)
+        elif com[0]=='like_message'and len(com) - 1 == 1:
+            like_message(com,mydb)
+        elif com[0]=='password_recovery'and len(com) - 1 == 0:
+            password_recovery(mydb)
 if __name__ == '__main__':
     mydb=connect()
     while True:
@@ -308,7 +391,8 @@ if __name__ == '__main__':
         inp = input('Please enter a number:\n'
                     '1- Sign Up\n'
                     '2- Sign In\n'
-                    '3- Exit\n')
+                    '3- recovery_pass\n'
+                    '4- Exit\n')
         if inp == "1":
             while True:
                 command = input('Please enter first_name/last_name/phone_number/user_id/password/email/answer the question(What is your favorite color?) \n'
@@ -328,7 +412,11 @@ if __name__ == '__main__':
                     check_login(command,mydb)
                 else:
                     print("Wrong input.")
-        elif inp == "3":
+        elif inp=="3":
+            command = input('Please enter user_name\n'
+                            'for example: ali98\n')
+            password_recovery(command,mydb)
+        elif inp == "4":
             close_DB()
             sys.exit(0)
         elif sign_flag:
