@@ -51,6 +51,7 @@ def register(command,mydb):
         # key = "mina"
         # hmac1 = hmac.new(key=key.encode(), msg=message.encode(), digestmod="sha1")
         # message_digest1 = hmac1.digest()
+
         query = "insert into `users`(`first_name`, `last_name`,`phone_number`, `user_id`, `pass`, `email`, `sec_answer`,`login`,`number_wrong`,`number_wrong_Q`,`date_wrong`) values(" + \
                 newComm[0] + "," + newComm[1] + "," + newComm[2] + "," + newComm[3] + "," +newComm[4]+ "," + newComm[
                     5] + "," + newComm[6] + "," + '"no"' + "," + "0" + "," + "0" + "," +'"'+ str(x)+'"' + ");"
@@ -132,7 +133,7 @@ def check_login(cammand,mydb):
                     myresult=fertchall_query(query,mydb)
                     mydb.commit()
                     time = datetime.datetime.now()
-                    query = "insert into logss (user_id,text_content,log_date) values(" + '"' + user + '"' + "," + "'password is wrong'" + ',' + '"' + str(time) + '"' + ");"
+                    query = "insert into logss (user_id,text_content,log_date) values(" + newComm[0] + "," + "'password is wrong'" + ',' + '"' + str(time) + '"' + ");"
                     my = fertchall_query(query, mydb)
                     mydb.commit()
                     print("password is not correct!!")
@@ -147,21 +148,20 @@ def print_help():
     print(
         'Enter \'/\' between arguments.\n'
         'find_person\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to find person\n'
-        'get_friends\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show your friends\n'
-        'get_request\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show your followers\n'
-        'get_blocks\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show your block list\n'
-        'follow\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to follow others\n'
-        'accept\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to accept followers\n'
-        'remove_friends\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to remove friends \n'
-        'block\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to block others\n'
-        'unblock\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to unblock block list\n'
-        'show_messages\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show your received messages \n'
-        'send_message\t\t/<username (string)>/<text (string)>/\t\t\t\t\t\t\t\t\t- to send message\n'
-        'like_message\t\t\t/<message id (int)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to like one of your message \n'
-        'sign_out \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to sign out\n'
-        
-        'show_logs \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show logs\n'
-        'delete_account \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to delete your account')
+        'get_friends\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show your friends\n'
+        'get_request\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show your followers\n'
+        'get_blocks\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show your block list\n'
+        'follow\t\t\t\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to follow others\n'
+        'accept\t\t\t\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to accept followers\n'
+        'remove_friends\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to remove friends \n'
+        'block\t\t\t\t\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to block others\n'
+        'unblock\t\t\t\t\t\t\t/<username (string)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to unblock block list\n'
+        'show_messages\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show your received messages \n'
+        'send_message\t\t\t/<username (string)>/<text (string)>/\t\t\t\t\t\t\t\t\t- to send message\n'
+        'like_message\t\t\t/<message id (int)>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to like one of your message \n'
+        'sign_out \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to sign out\n'       
+        'show_logs \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to show logs\n'
+        'delete_account \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t - to delete your account')
 def show_logs(mydb):
     try:
         query = "SELECT * FROM logss WHERE user_id=" + '"' + user + '"' + ";"
@@ -197,7 +197,9 @@ def password_recovery(my_user,mydb):
 
     try:
         query = "SELECT number_wrong_Q FROM users WHERE user_id=" + '"' + my_user + '"' + ";"
+
         number_wrong_Q=fertchall_query(query,mydb)
+        print(number_wrong_Q)
         if(number_wrong_Q[0][0]<5):
             print("pls enter the answer of security answer (What is your favorite color?) :")
             input1=input()
@@ -279,7 +281,7 @@ def send_message(com,mydb):
     newComm=new_command(com)
     if(user_exist(newComm[1],mydb)):
         print("gg")
-        query="SELECT follower FROM friends WHERE followed=" + '"' + user + '"' + 'and follower=' + newComm[1]+ ";"
+        query="SELECT follower FROM friends WHERE followed=" +  newComm[1] + 'and follower=' +'"' + user + '"'+ ";"
         myresult=fertchall_query(query,mydb)
         if(myresult):
             print("kk")
@@ -314,8 +316,8 @@ def block(com,mydb):
             myresult=fertchall_query(query,mydb)
             mydb.commit()
             print("block successful")
-            query1 = "DELETE FROM friends WHERE (follower=" + '"' + user + '"' + 'and followed=' + newComm[1] + ")or (follower="+newComm[1]+'"' + user + '")'+" ;"
-            query2 = "DELETE FROM requests WHERE (follower=" + '"' + user + '"' + 'and followed=' + newComm[1] + ")or (follower=" + newComm[1] + '"' + user + '")' + " ;"
+            query1 = "DELETE FROM friends WHERE (follower=" + '"' + user + '"' + 'and followed=' + newComm[1] + ")or (follower="+newComm[1]+'and followed='+'"' + user + '")'+" ;"
+            query2 = "DELETE FROM requests WHERE (follower=" + '"' + user + '"' + 'and followed=' + newComm[1] + ")or (follower=" + newComm[1] +'and followed='+ '"' + user + '")' + " ;"
             try:
                 myresult=fertchall_query(query1,mydb)
                 mydb.commit()
@@ -487,6 +489,8 @@ def login(command,mydb):
             send_message(com,mydb)
         elif com[0]=='show_messages'and len(com) - 1 == 0:
             show_messages(mydb)
+        elif com[0]=='show_logs'and len(com) - 1 == 0:
+            show_logs(mydb)
         elif com[0]=='like_message'and len(com) - 1 == 1:
             like_message(com,mydb)
 
@@ -498,7 +502,10 @@ def close_DB(mydb):
     mydb.close()
 if __name__ == '__main__':
     mydb=connect()
-    query="UPDATE users SET login='no' WHERE users.user_id = 'm412';"
+    query="UPDATE users SET login='no' WHERE users.user_id = 'oo412';"
+    myresult=fertchall_query(query,mydb)
+    mydb.commit()
+    query="UPDATE users SET login='no' WHERE users.user_id = 'moya';"
     myresult=fertchall_query(query,mydb)
     mydb.commit()
     # query="UPDATE users SET login='no' WHERE users.user_id = 'e412';"
@@ -523,8 +530,9 @@ if __name__ == '__main__':
         if inp == "1":
             while True:
                 command = input('Please enter first_name/last_name/phone_number/user_id/password/email/answer the question(What is your favorite color?) \n'
-                                'for example: mina/ahmadi/09124567893/m412/Mina1377/1999minaahmadi@gmail.com/pink\n').split('/')
-
+                                'for example: mina/ahmadi/09124567893/m412/Mina1377/1999minaahmadi@gmail.com/pink\ntype exit for going to menu\n').split('/')
+                if (command[0] == "exit" and len(command) == 1):
+                    break
                 if len(command) == 7 and re.fullmatch(r"[\d]{11}",command[2]) and re.search('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$',command[5]) and re.fullmatch(r'[A-Za-z0-9]{8,}',command[4]):
                     register(command,mydb)
 
@@ -541,13 +549,19 @@ if __name__ == '__main__':
                 if len(command) == 2:
                     check_login(command,mydb)
                     user=''
-                    break
+
                 else:
                     print("Wrong input.")
         elif inp=="3":
-            command = input('Please enter user_name\n'
-                            'for example: ali98\n')
-            password_recovery(command,mydb)
+            while True:
+                command = input('Please enter user_name\n'
+                                'for example: ali98\ntype exit for going to menu\n')
+
+                if (command== "exit" ):
+                    break
+                else:
+                    password_recovery(command,mydb)
+
         elif inp == "4":
             close_DB(mydb)
             sys.exit(0)
